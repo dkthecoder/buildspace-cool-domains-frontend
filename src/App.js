@@ -2,13 +2,14 @@ import React, {useEffect, useState} from 'react';
 import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 import {ethers} from "ethers";
+import contractAbi from './utils/contractABI.json';
 
 // Constants
 const TWITTER_HANDLE = 'It1swhat1t1s';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 // Add the domain you will be minting
 const tld = '.strawberry';
-const CONTRACT_ADDRESS = '0x030E1D2e498827566A519C8d9DB5259270Ad7203';
+const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
 const App = () => {
 	//Just a state variable we use to store our user's public wallet. Don't forget to import useState at the top.
@@ -20,45 +21,36 @@ const App = () => {
 
 	const connectWallet = async () => {
 		try {
-		  const { ethereum } = window;
-		  if (!ethereum) {
-			alert("Get MetaMask -> https://metamask.io/");
-			return;
-		  }
-	
-		  // Fancy method to request access to account.
-		  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-		
-		  // Boom! This should print out public address once we authorize Metamask.
-		  console.log("Connected", accounts[0]);
-		  setCurrentAccount(accounts[0]);
+			const { ethereum } = window;
+			if (!ethereum) {
+				alert("Get MetaMask -> https://metamask.io/");
+				return;
+			}
+			const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+			console.log("Connected", accounts[0]);
+			setCurrentAccount(accounts[0]);
 		} catch (error) {
 			console.log(error)
 		}
-	  }
+	}
 
-	// Gotta make sure this is async.
 	const checkIfWalletIsConnected = async () => {
 		const { ethereum } = window;
-
 		if (!ethereum) {
 			console.log("Make sure you have MetaMask!");
 			return;
 		} else {
 			console.log("We have the ethereum object", ethereum);
 		}
-	
-	// Check if we're authorized to access the user's wallet
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
-
-	// Users can have multiple authorized accounts, we grab the first one if its there!
-    if (accounts.length !== 0) {
-		const account = accounts[0];
-		console.log('Found an authorized account:', account);
-		setCurrentAccount(account);
-	  } else {
-		console.log('No authorized account found');
-	  }
+		const accounts = await ethereum.request({ method: 'eth_accounts' });
+		// Users can have multiple authorized accounts, we grab the first one if its there!
+    	if (accounts.length !== 0) {
+			const account = accounts[0];
+			console.log('Found an authorized account:', account);
+			setCurrentAccount(account);
+	  	} else {
+			console.log('No authorized account found');
+		}
 	};
 
 	const mintDomain = async () => {
@@ -107,23 +99,24 @@ const App = () => {
 	const renderNotConnectedContainer = () => (
 		<div className="connect-wallet-container">
 			<img src="https://i.giphy.com/media/idYdfZ9xxVgVPNXjs0/giphy.webp" alt="Strawberry boi gif" />
-			<button className="cta-button connect-wallet-button">Connect Wallet</button>
+			<button onClick={connectWallet} className="cta-button connect-wallet-button">Connect Wallet</button>
 		</div>
-	);
+	)
 
 	// Form to enter domain name and data
-	const renderInputForm = () =>{
+	const renderInputForm = () => {
 		return (
 			<div className="form-container">
 				<div className="first-row">
-					<input type="text" value={domain} placeholder='domain' onChange={e => setDomain(e.target.value)}/>
+					<input type="text" value={domain} placeholder="domain" onChange={e => setDomain(e.target.value)}/>
 					<p className='tld'> {tld} </p>
 				</div>
-
-				<input type="text" value={record} placeholder='whats ur ninja power' onChange={e => setRecord(e.target.value)}/>
+	  
+				<input type="text" value={record} placeholder='whats ur ninja power?' onChange={e => setRecord(e.target.value)}/>
+	  
 				<div className="button-container">
-					<button className='cta-button mint-button' disabled={null} onClick={null}>Mint</button>  
-					<button className='cta-button mint-button' disabled={null} onClick={null}>Set data</button>  
+					{/* Call the mintDomain function when the button is clicked*/}
+					<button className='cta-button mint-button' onClick={mintDomain}>Mint</button> 
 				</div>
 			</div>
 		);
@@ -145,10 +138,8 @@ const App = () => {
 				</div>
 
 				{!currentAccount && renderNotConnectedContainer()}
-				{/* Render the input form if an account is connected */}
 				{currentAccount && renderInputForm()}
 				
-
 				<div className="footer-container">
 					<img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
 					<a className="footer-text" href={TWITTER_LINK} target="_blank" rel="noreferrer">{`this guy made it(ish) @${TWITTER_HANDLE}`}</a>
