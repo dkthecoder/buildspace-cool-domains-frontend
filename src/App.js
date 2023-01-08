@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 
@@ -7,9 +7,11 @@ const TWITTER_HANDLE = 'It1swhat1t1s';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
+	//Just a state variable we use to store our user's public wallet. Don't forget to import useState at the top.
+	const [currentAccount, setCurrentAccount] = useState('');
 
 	// Gotta make sure this is async.
-	const checkIfWalletIsConnected = () => {
+	const checkIfWalletIsConnected = async () => {
 		// First make sure we have access to window.ethereum
 		const { ethereum } = window;
 
@@ -19,7 +21,20 @@ const App = () => {
 		} else {
 			console.log("We have the ethereum object", ethereum);
 		}
-	}
+	
+	// Check if we're authorized to access the user's wallet
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+
+	// Users can have multiple authorized accounts, we grab the first one if its there!
+    if (accounts.length !== 0) {
+		const account = accounts[0];
+		console.log('Found an authorized account:', account);
+		setCurrentAccount(account);
+	  } else {
+		console.log('No authorized account found');
+	  }
+	};
+
 
 	// Create a function to render if wallet is not connected yet
 	const renderNotConnectedContainer = () => (
@@ -62,6 +77,6 @@ const App = () => {
 			</div>
 		</div>
 	);
-}
+};
 
 export default App;
