@@ -10,6 +10,26 @@ const App = () => {
 	//Just a state variable we use to store our user's public wallet. Don't forget to import useState at the top.
 	const [currentAccount, setCurrentAccount] = useState('');
 
+	// Implement your connectWallet method here
+	const connectWallet = async () => {
+		try {
+		  const { ethereum } = window;
+		  if (!ethereum) {
+			alert("Get MetaMask -> https://metamask.io/");
+			return;
+		  }
+	
+		  // Fancy method to request access to account.
+		  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+		
+		  // Boom! This should print out public address once we authorize Metamask.
+		  console.log("Connected", accounts[0]);
+		  setCurrentAccount(accounts[0]);
+		} catch (error) {
+			console.log(error)
+		}
+	  }
+
 	// Gotta make sure this is async.
 	const checkIfWalletIsConnected = async () => {
 		// First make sure we have access to window.ethereum
@@ -40,16 +60,12 @@ const App = () => {
 	const renderNotConnectedContainer = () => (
 		<div className="connect-wallet-container">
 			<img src="https://i.giphy.com/media/idYdfZ9xxVgVPNXjs0/giphy.webp" alt="Strawberry boi gif" />
-			<button className="cta-button connect-wallet-button">
-				Connect Wallet
-			</button>
+			<button className="cta-button connect-wallet-button">Connect Wallet</button>
 		</div>
 	);
 
 	// This runs our function when the page loads.
-	useEffect(() => {
-		checkIfWalletIsConnected();
-	}, [])
+	useEffect(() => {checkIfWalletIsConnected()}, [])
 
 	return (
 		<div className="App">
@@ -63,16 +79,11 @@ const App = () => {
 					</header>
 				</div>
 
-				{renderNotConnectedContainer()}
+				{!currentAccount && renderNotConnectedContainer()}
 
 				<div className="footer-container">
 					<img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
-					<a
-						className="footer-text"
-						href={TWITTER_LINK}
-						target="_blank"
-						rel="noreferrer"
-					>{`built with @${TWITTER_HANDLE}`}</a>
+					<a className="footer-text" href={TWITTER_LINK} target="_blank" rel="noreferrer">{`this guy made it(ish) @${TWITTER_HANDLE}`}</a>
 				</div>
 			</div>
 		</div>
