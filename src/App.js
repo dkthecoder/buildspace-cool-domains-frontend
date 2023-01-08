@@ -1,16 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
+import {ethers} from "ethers";
 
 // Constants
 const TWITTER_HANDLE = 'It1swhat1t1s';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
+// Add the domain you will be minting
+const tld = '.strawberry';
+const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS_HERE';
 
 const App = () => {
 	//Just a state variable we use to store our user's public wallet. Don't forget to import useState at the top.
 	const [currentAccount, setCurrentAccount] = useState('');
+	// Add some state data propertie
+	const [domain, setDomain] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [record, setRecord] = useState('');
 
-	// Implement your connectWallet method here
 	const connectWallet = async () => {
 		try {
 		  const { ethereum } = window;
@@ -32,7 +39,6 @@ const App = () => {
 
 	// Gotta make sure this is async.
 	const checkIfWalletIsConnected = async () => {
-		// First make sure we have access to window.ethereum
 		const { ethereum } = window;
 
 		if (!ethereum) {
@@ -64,6 +70,24 @@ const App = () => {
 		</div>
 	);
 
+	// Form to enter domain name and data
+	const renderInputForm = () =>{
+		return (
+			<div className="form-container">
+				<div className="first-row">
+					<input type="text" value={domain} placeholder='domain' onChange={e => setDomain(e.target.value)}/>
+					<p className='tld'> {tld} </p>
+				</div>
+
+				<input type="text" value={record} placeholder='whats ur ninja power' onChange={e => setRecord(e.target.value)}/>
+				<div className="button-container">
+					<button className='cta-button mint-button' disabled={null} onClick={null}>Mint</button>  
+					<button className='cta-button mint-button' disabled={null} onClick={null}>Set data</button>  
+				</div>
+			</div>
+		);
+	}
+
 	// This runs our function when the page loads.
 	useEffect(() => {checkIfWalletIsConnected()}, [])
 
@@ -80,6 +104,9 @@ const App = () => {
 				</div>
 
 				{!currentAccount && renderNotConnectedContainer()}
+				{/* Render the input form if an account is connected */}
+				{currentAccount && renderInputForm()}
+				
 
 				<div className="footer-container">
 					<img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
